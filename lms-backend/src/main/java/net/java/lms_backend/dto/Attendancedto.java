@@ -6,7 +6,6 @@ public class Attendancedto {
     private String otp;
     private boolean active;
 
-
     public Attendancedto() {}
     // Getters and Setters
     public Long getStudentId() {

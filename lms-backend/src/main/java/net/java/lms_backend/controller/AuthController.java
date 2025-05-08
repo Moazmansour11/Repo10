@@ -19,25 +19,30 @@ import static net.java.lms_backend.mapper.UserMapper.ToUserLogin;
 public class AuthController {
 
     private final AuthService authService;
-//    private final AuthenticationManager authenticationManager;
-//    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthService authService) {
+    @Autowired
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
         this.authService = authService;
-//        this.authenticationManager = authenticationManager;
-//        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("login")
     public ResponseEntity<String> Login(@RequestBody LoginRequestDTO loginRequest) {
 
-       /* Authentication authentication = authenticationManager.authenticate(
+        // Uncommented the code and added authentication and JWT token generation
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Generate the JWT token for the authenticated user
         String token = jwtUtil.generateToken(loginRequest.getUsername());
-        return ResponseEntity.ok(token);*/
-        return authService.Login( ToUserLogin(loginRequest));
+
+        // Return the JWT token in the response
+        return ResponseEntity.ok("Bearer " + token);  // Returning token with "Bearer " prefix
     }
 
     @PostMapping("register")

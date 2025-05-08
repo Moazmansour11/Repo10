@@ -6,6 +6,8 @@ public class LessonDTO {
 
     private String content;
 
+    public LessonDTO(String title, String content) {}
+
     public String getTitle() {
         return title;
     }

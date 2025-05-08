@@ -7,10 +7,7 @@ public class LessonDTO {
     private String title;
 
     private String content;
-
-    //add const.
-    public LessonDTO(Lesson savedLesson) {
-    }
+    
 
 
     public String getTitle() {

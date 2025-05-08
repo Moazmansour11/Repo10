@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 @Setter
 @Service
 public class StudentService {
-    @Autowired
     private StudentRepository studentRepository;
     private final CourseRepository courseRepo;
     private final UserRepository userRepo;
@@ -59,13 +58,13 @@ public class StudentService {
     public StudentDTO updateStudent(Long id, StudentDTO studentDTO) {
         return studentRepository.findById(id)
                 .map(existingStudent -> {
-                    existingStudent.setUsername(studentDTO.getUsername());
-                    existingStudent.setEmail(studentDTO.getEmail());
-                    Student updatedStudent = studentRepository.save(existingStudent);
-                    return StudentMapper.mapToStudentDTO(updatedStudent);
+                    Student updatedStudent = StudentMapper.mapToStudent(studentDTO);
+                    updatedStudent.setId(id); // Preserve the original ID
+                    return StudentMapper.mapToStudentDTO(studentRepository.save(updatedStudent));
                 })
                 .orElse(null);
     }
+
 
     public boolean deleteStudent(Long id) {
         if (studentRepository.existsById(id)) {

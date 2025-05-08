@@ -31,8 +31,8 @@ public class AuthService {
     private final EmailSender emailSender;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtTokenProvider tokenProvider;  // Added JwtTokenProvider
-    private final AuthenticationManager authenticationManager;  // Added AuthenticationManager
+    private final JwtTokenProvider tokenProvider;
+    private final AuthenticationManager authenticationManager;
 
     public AuthService(UserService userService, EmailValidatorService emailValidatorService, ConfirmationTokenService confirmationTokenService, EmailSender emailSender, UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider tokenProvider, AuthenticationManager authenticationManager) {
         this.userService = userService;
@@ -40,8 +40,8 @@ public class AuthService {
         this.emailSender = emailSender;
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.tokenProvider = tokenProvider;  // Initialize JwtTokenProvider
-        this.authenticationManager = authenticationManager;  // Initialize AuthenticationManager
+        this.tokenProvider = tokenProvider;
+        this.authenticationManager = authenticationManager;
     }
 
     public ResponseEntity<String> register(RegisterDTO user) {

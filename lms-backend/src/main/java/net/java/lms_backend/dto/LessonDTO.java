@@ -7,7 +7,6 @@ public class LessonDTO {
     private String title;
 
     private String content;
-    
 
 
     public String getTitle() {

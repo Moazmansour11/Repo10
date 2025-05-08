@@ -14,6 +14,9 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+//missing constructor
+    public <E> Course(long l, String advancedSw, String courseOnSw, String s, List<E> mediaFile1, Instructor instructor) {
+    }
 
     public String getTitle() {
         return title;

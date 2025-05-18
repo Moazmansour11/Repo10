@@ -6,6 +6,7 @@ import net.java.lms_backend.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,47 +24,59 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 public class SecurityConfig {
 
     private final UserService userService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public SecurityConfig(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtUtil jwtUtil) {
-        this.userService = userService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.jwtUtil = jwtUtil;
+    public SecurityConfig(UserService userService,
+                          BCryptPasswordEncoder passwordEncoder,
+                          JwtUtil jwtUtil) {
+        this.userService    = userService;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil        = jwtUtil;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                .csrf(csrf -> csrf.disable())  // Disable CSRF for stateless auth
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // No sessions
+                // --------  stateless JWT baseline  --------
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // --------  endpoint rules  ----------------
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/confirm").permitAll()  // Public endpoints
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")  // Only ADMIN can access /api/admin/**
-                        .requestMatchers("/api/user/**").hasRole("USER")   // Only USER can access /api/user/**
-                        .anyRequest().authenticated()  // All other requests require authentication
+                        .requestMatchers("/api/auth/**").permitAll()     //  already there
+                        .requestMatchers(HttpMethod.GET, "/api/**").permitAll()  // already there
+                        .requestMatchers("/api/student/**").permitAll()  // <<< add this line
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // Add JWT filter
+
+                // --------  authentication plumbing  -------
+                .authenticationProvider(daoAuthenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtUtil, userService);  // Pass JwtUtil and UserService
-    }
-
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(bCryptPasswordEncoder);
-        provider.setUserDetailsService(userService); // Set custom UserDetailsService
-        return provider;
+        return new JwtAuthenticationFilter(jwtUtil, userService);
     }
 }
+

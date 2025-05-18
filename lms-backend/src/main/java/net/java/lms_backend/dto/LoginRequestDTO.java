@@ -48,5 +48,5 @@ public class LoginRequestDTO {
 
     public String getUsername() {
         return identifier;
-    }
+    } 
 }

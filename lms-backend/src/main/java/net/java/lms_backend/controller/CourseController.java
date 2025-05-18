@@ -26,7 +26,7 @@ public class CourseController {
         this.courseService=courseService;
         this.performanceRepo=performanceRepo;
     }
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<Coursedto> createCourse(@RequestBody Coursedto coursedto) {
         Coursedto newCourse=courseService.CreateCourse(coursedto);
         return new ResponseEntity<>(newCourse, HttpStatus.CREATED);

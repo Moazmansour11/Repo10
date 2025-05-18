@@ -11,48 +11,40 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public SecurityConfig(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+    public SecurityConfig(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtUtil jwtUtil) {
         this.userService = userService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtUtil = jwtUtil;
-        this.authenticationManager = authenticationManager;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        // Define security rules for URL patterns
-        http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Only accessible to users with ADMIN role
-                        .requestMatchers("/user/**").hasRole("USER")   // Only accessible to users with USER role
-                        .anyRequest().authenticated()                 // All others must be authenticated
-                );
-                //.csrf().disable()  // Disable CSRF for simplicity (adjust as needed for your application)
-               // .httpBasic();      // Enable basic authentication
         http
-                .csrf(csrf -> csrf.disable())  // Disable CSRF for stateless authentication (use this for stateless auth)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Ensure no session is created
+                .csrf(csrf -> csrf.disable())  // Disable CSRF for stateless auth
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // No sessions
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/confirm").permitAll()  // Public endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")  // Only ADMIN can access /api/admin/**
+                        .requestMatchers("/api/user/**").hasRole("USER")   // Only USER can access /api/user/**
                         .anyRequest().authenticated()  // All other requests require authentication
                 )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Add JWT filter
-
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // Add JWT filter
 
         return http.build();
     }
@@ -64,14 +56,14 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(authenticationManager, jwtUtil);  // Pass AuthenticationManager and JwtUtil to the filter
+        return new JwtAuthenticationFilter(jwtUtil, userService);  // Pass JwtUtil and UserService
     }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(bCryptPasswordEncoder);
-        provider.setUserDetailsService(userService); // Set the custom UserDetailsService
+        provider.setUserDetailsService(userService); // Set custom UserDetailsService
         return provider;
     }
 }

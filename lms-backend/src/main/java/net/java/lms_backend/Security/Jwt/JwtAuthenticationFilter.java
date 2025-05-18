@@ -4,6 +4,7 @@
     import jakarta.servlet.FilterChain;
     import jakarta.servlet.http.HttpServletRequest;
     import jakarta.servlet.http.HttpServletResponse;
+    import net.java.lms_backend.Service.UserService;
     import org.springframework.security.authentication.AuthenticationManager;
     import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
     import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +24,9 @@
         public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
             this.authenticationManager = authenticationManager;
             this.jwtUtil = jwtUtil;
+        }
+
+        public JwtAuthenticationFilter(JwtUtil jwtUtil, UserService userService) {
         }
 
         @Override

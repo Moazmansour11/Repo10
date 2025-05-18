@@ -14,6 +14,13 @@ public class AssignmentDTO {
     private Long courseId;
     private List<SubmissionDTO> submissions;
 
+    public AssignmentDTO(Long id, String title, String dueDate, long courseId, List<SubmissionDTO> submissions) {
+        this.id = id;
+        this.title = title;
+        this.dueDate = dueDate;
+        this.courseId = courseId;
+        this.submissions = submissions;
+    }
     public AssignmentDTO(String title, String dueDate, long courseId) {
         this.title = title;
         this.dueDate = dueDate;

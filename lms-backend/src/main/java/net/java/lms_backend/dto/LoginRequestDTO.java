@@ -9,6 +9,7 @@ public class LoginRequestDTO {
     private String identifier; // email or username
     private String password;
 //add const.
+
     public LoginRequestDTO() {}
     public LoginRequestDTO(String identifier, String password) {
         this.identifier = identifier;
@@ -36,6 +37,7 @@ public class LoginRequestDTO {
 
 
 
+
     public void setPassword(char[] password) {
         this.password = new String(password);
     }
@@ -44,5 +46,5 @@ public class LoginRequestDTO {
     }
     public String getUsername() {
         return identifier;
-    }
+    } 
 }

@@ -8,6 +8,9 @@ public class QuizAttemptDTO {
     private int score;
     private Map<Long, String> answers;
 
+
+    public QuizAttemptDTO() {}
+
     public Long getQuizId() {
         return quizId;
     }

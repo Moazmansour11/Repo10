@@ -35,6 +35,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        // Define security rules for URL patterns
+        http.authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Only accessible to users with ADMIN role
+                        .requestMatchers("/user/**").hasRole("USER")   // Only accessible to users with USER role
+                        .anyRequest().authenticated()                 // All others must be authenticated
+                );
+                //.csrf().disable()  // Disable CSRF for simplicity (adjust as needed for your application)
+               // .httpBasic();      // Enable basic authentication
         http
                 .csrf(csrf -> csrf.disable())  // Disable CSRF for stateless authentication (use this for stateless auth)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Ensure no session is created
@@ -43,6 +52,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()  // All other requests require authentication
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+
 
         return http.build();
     }

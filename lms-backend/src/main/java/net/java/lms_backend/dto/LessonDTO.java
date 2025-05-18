@@ -8,8 +8,6 @@ public class LessonDTO {
 
     private String content;
 
-   
-
     public LessonDTO(Lesson savedLesson) {
     }
 

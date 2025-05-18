@@ -10,7 +10,7 @@ import java.sql.Statement;
 
 public class ServerInitializer {
 
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/LMS";
+    private static final String DB_URL = "jdbc:h2:mem:lmsdb";
     private static final String DB_USER = "postgres";
     private static final String DB_PASSWORD = "1234";
 

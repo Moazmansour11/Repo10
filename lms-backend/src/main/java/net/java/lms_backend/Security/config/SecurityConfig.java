@@ -29,18 +29,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless authentication
-                .authorizeHttpRequests(auth -> auth
-                            .requestMatchers(
-                                "/**"
-
-                            )
-//                        .requestMatchers("/api/auth/login",
-//                                "/api/auth/register",
-//                                "/api/auth/confirm").permitAll() // Public endpoints for login, register, etc.
-//                        .anyRequest().authenticated() // All other requests require authentication
+        // Define security rules for URL patterns
+        http.authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Only accessible to users with ADMIN role
+                        .requestMatchers("/user/**").hasRole("USER")   // Only accessible to users with USER role
+                        .anyRequest().authenticated()                 // All others must be authenticated
                 );
+                //.csrf().disable()  // Disable CSRF for simplicity (adjust as needed for your application)
+               // .httpBasic();      // Enable basic authentication
 
         return http.build();
     }
